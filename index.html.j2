@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly-additions.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+    .bs-callout {
+          padding: 20px;
+          margin: 20px 0;
+          border: 1px solid #eee;
+          border-left-width: 5px;
+          border-radius: 3px;
+      }
+      .bs-callout h4 {
+          margin-top: 0;
+          margin-bottom: 5px;
+      }
+      .bs-callout p:last-child {
+          margin-bottom: 0;
+      }
+      .bs-callout code {
+          border-radius: 3px;
+      }
+      .bs-callout+.bs-callout {
+          margin-top: -5px;
+      }
+      .bs-callout-default {
+          border-left-color: #777;
+      }
+      .bs-callout-default h4 {
+          color: #777;
+      }
+      .bs-callout-primary {
+          border-left-color: #428bca;
+      }
+      .bs-callout-primary h4 {
+          color: #428bca;
+      }
+      .bs-callout-success {
+          border-left-color: #5cb85c;
+      }
+      .bs-callout-success h4 {
+          color: #5cb85c;
+      }
+      .bs-callout-danger {
+          border-left-color: #d9534f;
+      }
+      .bs-callout-danger h4 {
+          color: #d9534f;
+      }
+      .bs-callout-warning {
+          border-left-color: #f0ad4e;
+      }
+      .bs-callout-warning h4 {
+          color: #f0ad4e;
+      }
+      .bs-callout-info {
+          border-left-color: #5bc0de;
+      }
+      .bs-callout-info h4 {
+          color: #5bc0de;
+      }
+      .vis-item.ansibleRelease {
+           border-color: black;
+           background-color: black;
+           color: white
+      }
+      .vis-item.ansibleNetworkCollectionRelease {
+           border-color: gray;
+           background-color: gray;
+           color: white
+      }
+      .vis-item.sprint {
+           border-color: silver;
+           background-color: silver;
+           color: white
+      }
+      .vis-item.topology {
+           background-color: navy;
+           border-color: navy;
+           color: white;
+      }
+      .vis-item.foundation {
+           background-color: olive;
+           border-color: olive;
+           color: white;
+      }
+      .vis-item.policy {
+           background-color: maroon;
+           border-color: maroon;
+           color: white;
+      }
+      .vis-item.operations {
+           background-color: green;
+           border-color: green;
+           color: white;
+      }
+      .vis-item.services {
+           background-color: teal;
+           border-color: teal;
+           color: white;
+      }
+    </style>
+    <title>[WIP] Resource Module Roadmap Planning</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-*-*">
+          <div class="bs-callout bs-callout-warning">
+            <h4>Warning</h4>
+            The information below is for planning purposes only.  It was dynamically generated based on several input files and parameters which built the timeline.
+            For the source files and code used to generate it, go here: <A HREF="https://github.com/cidrblock/rm_planning">https://github.com/cidrblock/rm_planning</A>
+          </div>
+          <h1>[WIP] Resource Module Roadmap Planning</h1>
+          <h3>Assumptions</h3>
+          <table class="table">
+            <tr><th>Start date</th><td>{{ settings.START_DATE }}</td></tr>
+            <tr><th>Full time engineers</th><td>{{ settings.FTES }}</td></tr>
+            <tr><th>Percent allocated per FTE</th><td>{{ settings.PERCENT_ALLOCATED }}</td></tr>
+            <tr><th>Sprint duration</th><td>{{ settings.SPRINT_WKS }} weeks</td></tr>
+            <tr><th>Total hours per sprint</th><td>{{ settings.HOURS_PER_SPRINT }}</td></tr>
+            <tr><th>Est. hours per point:</th><td>{{ settings.HRS_PER_POINT }}</td></tr>
+            <tr><th>Network collection releases</th><td>Follows the latest major ansible release, minor incremented per sprint/release, every sprint duration.</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-*-*">
+          <div class="panel-group">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" href="#collapse1">Timeline</a>
+                </h4>
+              </div>
+              <div id="collapse1" class="panel-collapse collapse in">
+                <div class="panel-body">
+                  <div id="mytimeline" style="background-color: #FAFAFA;"></div>
+                  <div id="visualization"></div>
+                </div>
+                <div class="panel-footer">Panel Footer</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-*-*">
+          <div class="panel-group">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" href="#collapse2">By release</a>
+                </h4>
+              </div>
+              <div id="collapse2" class="panel-collapse collapse in">
+                <div class="panel-body">
+                  <div id="byReleaseMarkdown">
+
+{% for date in dates -%}
+{% if date['className'] == "ansibleNetworkCollectionRelease" -%}
+## Network Collection {{ date['content'] }}
+**Target release date:** {{ date['start_human'] }}
+**Resource Modules:**
+{% for rm in date['resource_modules'] -%}
+- {{ rm['content'] }}
+{% endfor %}
+{%- endif %}
+{%- endfor %}
+                  </div>
+                </div>
+                <div class="panel-footer">Panel Footer</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-*-*">
+          <div class="panel-group">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" href="#collapse3">By sprint</a>
+                </h4>
+              </div>
+              <div id="collapse3" class="panel-collapse collapse in">
+                <div class="panel-body">
+                  <div id="bySprintMarkdown">
+{% for date in dates %}
+{% if date['className'] == "sprint" %}
+## Sprint #{{ date['content'] }}
+**Total hours:** {{ date['total'] }}
+**End date:** {{ date['start_human'] }}
+{% for rm in date['resource_modules'] -%}
+- {{ rm['content'] }}
+{% endfor %}
+{%- endif %}
+{%- endfor %}
+                  </div>
+                </div>
+                <div class="panel-footer">Panel Footer</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/js/patternfly.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
+    <script type="text/javascript">
+        var container = document.getElementById('visualization');
+
+      // create a data set with groups
+        var names = {{ groups|tojson }};
+        var groups = new vis.DataSet();
+        for (var g = 0; g < names.length; g++) {
+          groups.add({id: g, content: names[g]});
+        }
+
+        var txtData = '{{ dates|tojson }}'
+        var data = JSON.parse(txtData);
+
+        var items = new vis.DataSet();
+        items.clear();
+        items.add(data);
+
+        var options = {  };
+
+        var timeline = new vis.Timeline(container);
+        timeline.setOptions(options);
+        timeline.setGroups(groups);
+        timeline.setItems(items);
+    </script>
+    <script>
+      var conv = new showdown.Converter();
+      conv.setOption('literalMidWordUnderscores', true);
+      conv.setOption('simpleLineBreaks', true);
+      for (c of ['bySprintMarkdown', 'byReleaseMarkdown']) {
+        console.log(c)
+        var txt = document.getElementById(c).innerHTML;
+        document.getElementById(c).innerHTML = conv.makeHtml(txt);
+      }
+    </script>
+  </body>
+</html>
