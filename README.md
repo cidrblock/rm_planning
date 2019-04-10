@@ -20,4 +20,4 @@ See the settings.py file.
 
 `python generate.py`
 
-(developed using python3.7.2)
+(developed and test using python3.7.2)
